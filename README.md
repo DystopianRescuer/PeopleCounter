@@ -6,11 +6,11 @@ Un script en Python que captura la imagen de la camara web, y utilizando las bib
 
 Primero hay que instalar las dependencias necesarias, para esto normalmente
 solo es requerido un:
-´´´
+```
 pip install -r requirements.txt
-´´´
+```
 
 Una vez hecho esto, podemos correr el programa con:
-´´´
+```
 python3 app.py
-´´´
+```
