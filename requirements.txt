@@ -55,3 +55,4 @@ scikit-image==0.17.2
 lap==0.4.0
 ultralytics
 cvzone
+
