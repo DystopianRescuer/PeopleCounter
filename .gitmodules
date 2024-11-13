@@ -1,0 +1,6 @@
+[submodule "Lap-pkg-for-YOLO"]
+	path = Lap-pkg-for-YOLO
+	url = https://github.com/Adnedvid/Lap-pkg-for-YOLO
+[submodule "sort"]
+	path = sort
+	url = https://github.com/abewley/sort
