@@ -4,15 +4,11 @@ from ultralytics import YOLO
 import cv2
 import math
 import argparse
-from sort import *
 
 
-def testing():
-    cap = cv2.VideoCapture(0)
-    cap.set(3, 640)
-    cap.set(4, 480)
 
-    tracker = Sort()
+def count_people(capturer, x1, y1, x2, y2):
+    """ Start counting people using the two points provided to make the line """
 
     model = YOLO("yolov8n")
 
@@ -30,7 +26,7 @@ def testing():
 
     while True:
         # take the image
-        ret, img= cap.read()
+        ret, img= capturer.read()
 
         # Analyzes the image
         results = model(img, stream=True)
@@ -71,25 +67,18 @@ def testing():
         if cv2.waitKey(1) == ord('q'):
             break
 
-    cap.release()
-    cv2.destroyAllWindows()
-
-
-def count_people(x1, y1, x2, y2):
-    """ Start counting people using the two points provided to make the line """
-    return
-
 
 def line_selector(img):
     """ Function to let user decide which line gon be used """
-    return
+    
+    return 0, 0, 0, 0
 
 
 def parse_args():
     """ Reads flags """
     parser = argparse.ArgumentParser(description="Process camera or video input.")
 
-    # Añade la bandera --camera / -c
+    # Camera as input flag, no params
     parser.add_argument(
         "-c", "--camera",
         action="store_true",
@@ -97,7 +86,7 @@ def parse_args():
         help="Usar la cámara en lugar de un archivo de video"
     )
 
-    # Añade la bandera -i para la ruta del archivo de video
+    # Input flag expected to receive a path
     parser.add_argument(
         "-i",
         "--input",
@@ -105,18 +94,16 @@ def parse_args():
         help="Ruta del archivo de video"
     )
 
-    # Configura la incompatibilidad entre --camera y --input
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-c", "--camera", action="store_true", help="Usar la cámara en lugar de un archivo de video")
-    group.add_argument("-i", "--input", type=str, help="Ruta del archivo de video")
-
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    testing()
     args = parse_args()
     if args.camera:
-        print("Usando cámara como fuente de video")
+        capturer = cv2.VideoCapture(0)
+        capturer.set(3, 640)
+        capturer.set(4, 480)
+        x1, y1, x2, y2 = line_selector(capturer.read())
+        count_people(capturer, x1, y1, x2, y2)
     else:
-        print(f"Usando archivo de video: {args.input}")
+        capturer = cv2.VideoCapture(args.input)
