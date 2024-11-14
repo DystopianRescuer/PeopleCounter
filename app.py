@@ -7,7 +7,7 @@ import argparse
 
 
 
-def count_people(capturer, x1, y1, x2, y2):
+def count_people(capturer, start_point, end_point):
     """ Start counting people using the two points provided to make the line """
 
     model = YOLO("yolov8n")
@@ -35,7 +35,7 @@ def count_people(capturer, x1, y1, x2, y2):
         for r in results:
 
             # First draws the line for user reference
-            cv2.line(img, x1, y1, x2, y2, (0, 255, 0), 2)
+            cv2.line(img, start_point, end_point,(0, 255, 0), 2)
 
             # Takes all boxes by
             boxes = r.boxes
@@ -107,7 +107,7 @@ def line_selector(image):
     # Cerrar la ventana y retornar las coordenadas
     cv2.destroyAllWindows()
     
-    return start_point[0], start_point[1], end_point[0], end_point[1]
+    return start_point, end_point 
 
 
 def draw_line(event, x, y, flags, param):
@@ -156,5 +156,5 @@ if __name__ == "__main__":
     args = parse_args()
     capturer = cv2.VideoCapture(0 if args.camera else args.input)
     ret, img = capturer.read()
-    x1, y1, x2, y2 = line_selector(img)
-    count_people(capturer, x1, y1, x2, y2)
+    start_point, end_point = line_selector(img)
+    count_people(capturer, start_point, end_point)
