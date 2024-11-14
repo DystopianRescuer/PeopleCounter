@@ -26,7 +26,8 @@ Una vez hecho esto, podemos correr el programa y ver la hoja de ayuda con:
 ```
 chmod +x pc.py
 ./pc.py
+```
 
-Una vez abierto el programa con la opción seleccionada, podemos trazar la linea con el mouse, y una vez trazada, presionar q para comenzar el trackeo.
+Una vez abierto el programa con la opción seleccionada, podemos trazar la línea con el mouse, y una vez trazada, presionar 'q' para comenzar el trackeo.
 
-Para salir del programa presionamos q otra vez
+Para salir del programa presionamos 'q' otra vez
