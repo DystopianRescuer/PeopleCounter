@@ -6,6 +6,12 @@ import math
 import argparse
 
 
+# Some variables to track
+drawing = False
+start_point = None
+end_point = None
+counter = 0
+
 
 def count_people(capturer, start_point, end_point):
     """ Start counting people using the two points provided to make the line """
@@ -30,14 +36,17 @@ def count_people(capturer, start_point, end_point):
 
         # Analyzes the image
         results = model(img, stream=True)
-    
+
         # For every result...
         for r in results:
 
             # First draws the line for user reference
             cv2.line(img, start_point, end_point,(0, 255, 0), 2)
 
-            # Takes all boxes by
+            # Draws the counter
+            cv2.putText(img, f"Counter: {counter}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+
+            # Takes all boxes provided by the model
             boxes = r.boxes
         
             # Takes its boxes and paints em' all
@@ -73,10 +82,6 @@ def count_people(capturer, start_point, end_point):
             break
 
 
-# Some variables need to track the drawing
-drawing = False
-start_point = None
-end_point = None
 
 def line_selector(image):
     """ Function to let user decide which line gon be used """
@@ -89,22 +94,21 @@ def line_selector(image):
     cv2.imshow(title, image)
     cv2.setMouseCallback(title, draw_line)
 
-    # Loop para actualizar la imagen mientras se dibuja la línea
+    # Update image while user drawing the line 
     while True:
         temp_image = image.copy()
         
         if start_point and end_point:
-            # Dibujar la línea temporal en la imagen
             cv2.line(temp_image, start_point, end_point, (0, 255, 0), 2)
         
-        # Mostrar la imagen actualizada
+        # Shows updated image
         cv2.imshow(title, temp_image)
         
-        # Presionar 'q' para salir
+        # Press q to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Cerrar la ventana y retornar las coordenadas
+    # Close the window
     cv2.destroyAllWindows()
     
     return start_point, end_point 
