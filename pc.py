@@ -14,10 +14,12 @@ start_point = None
 end_point = None
 counter = 0
 tracker = Sort()
+crossed_ids = {}
 
 
 def count_people(capturer, start_point, end_point):
     global counter
+    global crossed_ids
     """ Start counting people using the two points provided to make the line """
     startX, startY = start_point
     endX, endY = end_point
@@ -68,11 +70,9 @@ def count_people(capturer, start_point, end_point):
 
                 # confidence
                 confidence = math.ceil((box.conf[0]*100))/100
-                print("Confidence --->",confidence)
 
                 # class name
                 cls = int(box.cls[0])
-                print("Class name -->", classNames[cls])
 
                 # Adding people objects to detections, and verifying the position.
                 if classNames[cls] == "person":
@@ -87,17 +87,9 @@ def count_people(capturer, start_point, end_point):
 
                 cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
                 # Convertir detections a numpy array antes de pasarlo a SORT y verificar dimensiones
-                if len(detections) > 0:
-                    detections = np.array(detections)
-                    # Forzar detections a forma (N, 5) si falta alguna columna
-                    if detections.shape[1] != 5:
-                        print("Warning: Reshaping detections to ensure correct format for SORT")
-                        detections = np.reshape(detections, (-1, 5))
-                else:
-                    print("Arreglo vacio")
-                    detections = np.empty((0, 5))
 
-            tracked_objects = tracker.update(detections)
+            sortDetections = np.array(detections)
+            tracked_objects = tracker.update(sortDetections)
             for obj in tracked_objects:
                 x1_box, y1_box, x2_box, y2_box, obj_id = map(int, obj)
                 cv2.putText(img, f"ID {obj_id}", (x1_box, y1_box - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
@@ -109,8 +101,10 @@ def count_people(capturer, start_point, end_point):
 
                 # Verificar si el centro cruza la línea
                 if startY <= center_y <= endY and (startX <= center_x <= endX):
-                    counter += 1
-                    print(f"Persona cruzando la línea! Total: {counter}")
+                     if obj_id not in crossed_ids:
+                         counter += 1
+                         crossed_ids[obj_id] = True  # Marcar como contado
+                         print(f"Persona cruzando la línea! Total: {counter}")
 
          # Shows the image
         cv2.imshow('Webcam', img)
