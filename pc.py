@@ -86,8 +86,7 @@ def count_people(capturer, start_point, end_point):
                 thickness = 2
 
                 cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
-                # Convertir detections a numpy array antes de pasarlo a SORT y verificar dimensiones
-
+                
             tracked_objects = []
             if len(detections) > 0:
                 sortDetections = np.array(detections)
@@ -96,7 +95,7 @@ def count_people(capturer, start_point, end_point):
             else:
                    sortDetections = np.empty((0, 5))
 
-            # Solo actualiza el rastreador si hay detecciones
+            # Updates only if there's detections
             if sortDetections.size > 0:
               tracked_objects = tracker.update(sortDetections)
             else:
@@ -106,19 +105,19 @@ def count_people(capturer, start_point, end_point):
                 x1_box, y1_box, x2_box, y2_box, obj_id = map(int, obj)
                 cv2.putText(img, f"ID {obj_id}", (x1_box, y1_box - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-                # Calcular el centro del bounding box
+                # Takes the center
                 center_x = int((x1_box + x2_box) / 2)
                 center_y = int((y1_box + y2_box) / 2)
                 cv2.circle(img, (center_x, center_y), 5, (0, 0, 255), -1)
 
-                # Verificar si el centro cruza la línea
+                # Center cross the line?
                 if startY <= center_y <= endY and (startX <= center_x <= endX):
                      if obj_id not in crossed_ids:
                          counter += 1
                          crossed_ids[obj_id] = True  # Marcar como contado
                          print(f"Persona cruzando la línea! Total: {counter}")
 
-         # Shows the image
+        # Shows the image
         cv2.imshow('Webcam', img)
 
         if cv2.waitKey(1) == ord('q'):
@@ -162,16 +161,16 @@ def draw_line(event, x, y, flags, param):
     global start_point, end_point, drawing
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        # Cuando se presiona el botón izquierdo del mouse, comienza el trazo
+        # When left clicking 
         drawing = True
         start_point = (x, y)
 
     elif event == cv2.EVENT_MOUSEMOVE and drawing:
-        # Actualiza la posición del punto final mientras el mouse se mueve
+        # When dragging
         end_point = (x, y)
 
     elif event == cv2.EVENT_LBUTTONUP:
-        # Cuando se suelta el botón izquierdo del mouse, finaliza el trazo
+        # When realising
         drawing = False
         end_point = (x, y)
 
