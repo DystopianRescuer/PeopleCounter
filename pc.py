@@ -4,6 +4,7 @@ from ultralytics import YOLO
 import cv2
 import math
 import argparse
+import sys
 
 
 # Some variables to track
@@ -135,26 +136,26 @@ def draw_line(event, x, y, flags, param):
 
 def parse_args():
     """ Reads flags """
-    parser = argparse.ArgumentParser(description="Process camera or video input.")
+    parser = argparse.ArgumentParser(description="Program to count how many people have passed through a line")
 
-    # Camera as input flag, no params
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         "-c", "--camera",
         action="store_true",
-        default=False,
-        help="Usar la cámara en lugar de un archivo de video"
+        help="Use the camera as input"
+    )
+    group.add_argument(
+        "-i", "--input",
+        type=str,
+        help="Use the path provided as input"
     )
 
-    # Input flag expected to receive a path
-    parser.add_argument(
-        "-i",
-        "--input",
-        type=str,
-        help="Ruta del archivo de video"
-    )
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     return parser.parse_args()
-
+    
 
 if __name__ == "__main__":
     args = parse_args()

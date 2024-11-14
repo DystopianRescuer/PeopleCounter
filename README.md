@@ -24,6 +24,6 @@ pip install -r requirements.txt
 
 Una vez hecho esto, podemos correr el programa y ver la hoja de ayuda con:
 ```
-chmod +x app.py
-./app.py
+chmod +x pc.py
+./pc.py
 ```
