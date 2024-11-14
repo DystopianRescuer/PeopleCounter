@@ -5,6 +5,7 @@ import cv2
 import math
 import argparse
 import sys
+from sort.sort import *
 
 
 # Some variables to track
@@ -12,10 +13,14 @@ drawing = False
 start_point = None
 end_point = None
 counter = 0
+tracker = Sort()
 
 
 def count_people(capturer, start_point, end_point):
+    global counter
     """ Start counting people using the two points provided to make the line """
+    startX, startY = start_point
+    endX, endY = end_point
 
     model = YOLO("yolov8n")
 
@@ -35,9 +40,11 @@ def count_people(capturer, start_point, end_point):
         # take the image
         ret, img= capturer.read()
 
+
         # Analyzes the image
         results = model(img, stream=True)
 
+        detections = []
         # For every result...
         for r in results:
 
@@ -67,6 +74,10 @@ def count_people(capturer, start_point, end_point):
                 cls = int(box.cls[0])
                 print("Class name -->", classNames[cls])
 
+                # Adding people objects to detections, and verifying the position.
+                if classNames[cls] == "person":
+                    detections.append([x1, y1, x2, y2, confidence])
+
                 # object details
                 org = [x1, y1]
                 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -75,6 +86,31 @@ def count_people(capturer, start_point, end_point):
                 thickness = 2
 
                 cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
+                # Convertir detections a numpy array antes de pasarlo a SORT y verificar dimensiones
+                if len(detections) > 0:
+                    detections = np.array(detections)
+                    # Forzar detections a forma (N, 5) si falta alguna columna
+                    if detections.shape[1] != 5:
+                        print("Warning: Reshaping detections to ensure correct format for SORT")
+                        detections = np.reshape(detections, (-1, 5))
+                else:
+                    print("Arreglo vacio")
+                    detections = np.empty((0, 5))
+
+            tracked_objects = tracker.update(detections)
+            for obj in tracked_objects:
+                x1_box, y1_box, x2_box, y2_box, obj_id = map(int, obj)
+                cv2.putText(img, f"ID {obj_id}", (x1_box, y1_box - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+                # Calcular el centro del bounding box
+                center_x = int((x1_box + x2_box) / 2)
+                center_y = int((y1_box + y2_box) / 2)
+                cv2.circle(img, (center_x, center_y), 5, (0, 0, 255), -1)
+
+                # Verificar si el centro cruza la línea
+                if startY <= center_y <= endY and (startX <= center_x <= endX):
+                    counter += 1
+                    print(f"Persona cruzando la línea! Total: {counter}")
 
          # Shows the image
         cv2.imshow('Webcam', img)
