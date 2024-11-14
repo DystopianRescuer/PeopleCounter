@@ -88,8 +88,20 @@ def count_people(capturer, start_point, end_point):
                 cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
                 # Convertir detections a numpy array antes de pasarlo a SORT y verificar dimensiones
 
-            sortDetections = np.array(detections)
-            tracked_objects = tracker.update(sortDetections)
+            tracked_objects = []
+            if len(detections) > 0:
+                sortDetections = np.array(detections)
+                if sortDetections.shape[1] != 5:
+                    sortDetections = np.reshape(sortDetections, (-1, 5))
+            else:
+                   sortDetections = np.empty((0, 5))
+
+            # Solo actualiza el rastreador si hay detecciones
+            if sortDetections.size > 0:
+              tracked_objects = tracker.update(sortDetections)
+            else:
+               tracked_objects = []
+
             for obj in tracked_objects:
                 x1_box, y1_box, x2_box, y2_box, obj_id = map(int, obj)
                 cv2.putText(img, f"ID {obj_id}", (x1_box, y1_box - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
